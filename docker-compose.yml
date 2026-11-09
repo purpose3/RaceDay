@@ -1,6 +1,7 @@
 # Starts the whole RaceDay system with one command:  docker compose up --build
 #   Website  -> http://localhost:8080
 #   API docs -> http://localhost:8081/swagger
+
 name: raceday
 
 services:

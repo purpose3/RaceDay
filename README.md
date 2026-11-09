@@ -1,6 +1,6 @@
 # RaceDay API (Part 2)
 
-ASP.NET Core Web API for **RaceDay**, an event management system for South African road running, walking and cycling events. Organisers create events, categories and results; participants browse events, enrol and track their performance. The MVC front end is built in Part 3 on top of this API.
+ASP.NET Core Web API for **RaceDay**, an event management system for South African road running, walking and cycling events. This system helps organisers create events, categories and results; participants browse events, enroll and track their performance. The MVC front end is built in Part 3 on top of this API.
 
 ## Tech stack
 
@@ -44,6 +44,7 @@ RaceDay.Tests/   Unit/integration tests
    Update-Database
    ```
    (or `dotnet ef migrations add InitialCreate` and `dotnet ef database update`). Once migrations exist, the app applies them on startup.
+
 
 Development invite code for registering Organisers: `RACEDAY-ORGANISER-2026` (from `appsettings.Development.json`).
 

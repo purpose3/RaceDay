@@ -15,6 +15,7 @@ builder.Services.AddHttpContextAccessor();
 // identified by a secure cookie. The MVC app has no database; every operation goes through the API.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>
+                            
 {
     o.IdleTimeout = TimeSpan.FromMinutes(60);
     o.Cookie.Name = ".RaceDay.Session";
@@ -22,6 +23,7 @@ builder.Services.AddSession(o =>
     o.Cookie.IsEssential = true;
     o.Cookie.SameSite = SameSiteMode.Lax;
 });
+
 builder.Services.AddScoped<UserSession>();
 
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]

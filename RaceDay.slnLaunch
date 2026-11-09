@@ -1,0 +1,9 @@
+[
+  {
+    "Name": "RaceDay (API + Website)",
+    "Projects": [
+      { "Path": "RaceDay.Api\\RaceDay.Api.csproj", "Action": "Start" },
+      { "Path": "RaceDay.Web\\RaceDay.Web.csproj", "Action": "Start" }
+    ]
+  }
+]

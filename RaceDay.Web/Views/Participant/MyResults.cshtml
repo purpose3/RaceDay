@@ -1,0 +1,69 @@
+@model List<MyResult>
+@{ ViewData["Title"] = "My results"; }
+
+<h1 class="rd-title">My results</h1>
+<p class="text-muted">Your race history across every event you've completed. Results are captured by the organiser after each event.</p>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-empty">
+        <div class="rd-empty-icon">⏱️</div>
+        <h2>No results yet</h2>
+        <p class="text-muted">Once an organiser records your finish time, your race history will appear here.</p>
+        <a asp-controller="Participant" asp-action="MyEnrolments" class="btn btn-primary">View my enrolments</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var r in Model)
+        {
+            <div class="col-md-6">
+                <div class="card rd-panel rd-result h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <h2 class="rd-card-title mb-1">
+                                    <a asp-controller="Home" asp-action="Details" asp-route-id="@r.EventId">@r.EventName</a>
+                                </h2>
+                                <p class="text-muted mb-0">@Format.Date(r.EventDate) · @r.CategoryName · 📍 @r.Location</p>
+                            </div>
+                            <span class="rd-bib">@r.BibNumber</span>
+                        </div>
+
+                        <div class="rd-result-stats mt-3">
+                            <div>
+                                <span class="rd-stat">@Format.Time(r.FinishTime)</span>
+                                <small class="text-muted d-block">Finish time</small>
+                            </div>
+                            <div>
+                                @if (r.OverallPosition is { } overall)
+                                {
+                                    <span class="rd-stat">@Format.Ordinal(overall)</span>
+                                    <small class="text-muted d-block">out of @r.TotalFinishers finishers</small>
+                                }
+                                else
+                                {
+                                    <span class="rd-stat">-</span>
+                                    <small class="text-muted d-block">Position not recorded</small>
+                                }
+                            </div>
+                            <div>
+                                @if (r.CategoryPosition is { } cat)
+                                {
+                                    <span class="rd-stat">@Format.Ordinal(cat)</span>
+                                    <small class="text-muted d-block">out of @r.CategoryFinishers in category</small>
+                                }
+                                else
+                                {
+                                    <span class="rd-stat">-</span>
+                                    <small class="text-muted d-block">Category position not recorded</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

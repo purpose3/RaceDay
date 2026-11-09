@@ -1,0 +1,69 @@
+@model OrganiserDashboard
+@{ ViewData["Title"] = "My events"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h1 class="rd-title mb-0">My events</h1>
+        <p class="text-muted mb-0">Create, edit and manage every event you organise.</p>
+    </div>
+    <a asp-action="CreateEvent" class="btn btn-primary btn-lg">+ Create event</a>
+</div>
+
+@if (Model.Events.Count == 0)
+{
+    <div class="rd-empty">
+        <div class="rd-empty-icon">📣</div>
+        <h2>You haven't created any events yet</h2>
+        <p class="text-muted">Create your first event, add categories, and participants can start enrolling.</p>
+        <a asp-action="CreateEvent" class="btn btn-primary">Create your first event</a>
+    </div>
+}
+else
+{
+    <div class="card rd-panel">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th class="text-center">Categories</th>
+                        <th class="text-center">Enrolments</th>
+                        <th class="text-center">Results</th>
+                        <th>Status</th>
+                        <th class="text-end">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.Events)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="fw-semibold">@e.EventName</a><br />
+                                <small class="text-muted">@Format.EventIcon(e.EventType) @e.EventType · @Format.Km(e.DistanceKm) · 📍 @e.Location</small>
+                            </td>
+                            <td>@Format.Date(e.EventDate)</td>
+                            <td class="text-center">@e.CategoryCount</td>
+                            <td class="text-center"><strong>@e.TotalEnrolments</strong></td>
+                            <td class="text-center">@e.ResultsCaptured</td>
+                            <td>
+                                @if (e.IsUpcoming) { <span class="status-badge status-confirmed">Upcoming</span> }
+                                else { <span class="status-badge status-completed">Completed</span> }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Categories" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">Categories</a>
+                                <a asp-action="Enrolments" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">Enrolments</a>
+                                <a asp-action="Results" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">Results</a>
+                                <a asp-action="EditEvent" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <form asp-action="DeleteEvent" asp-route-id="@e.EventId" method="post" class="d-inline"
+                                      data-confirm="Delete this event? This can't be undone. Events with enrolments can't be deleted.">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

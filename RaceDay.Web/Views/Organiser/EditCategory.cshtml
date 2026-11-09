@@ -1,0 +1,46 @@
+@model CategoryEditViewModel
+@{ ViewData["Title"] = "Edit category"; }
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item"><a asp-action="Categories" asp-route-id="@Model.EventId">@Model.EventName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit category</li>
+    </ol>
+</nav>
+
+<h1 class="rd-title">Edit category</h1>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card rd-panel">
+            <div class="card-body p-4">
+                <form asp-action="EditCategory" asp-route-id="@Model.CategoryId" asp-route-eventId="@Model.EventId" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Form.CategoryName" class="form-label"></label>
+                        <input asp-for="Form.CategoryName" class="form-control" maxlength="100" required />
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label asp-for="Form.DistanceKm" class="form-label"></label>
+                            <input asp-for="Form.DistanceKm" type="number" step="0.1" min="0.1" class="form-control" required />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Form.EntryFee" class="form-label"></label>
+                            <input asp-for="Form.EntryFee" type="number" step="0.01" min="0" class="form-control" required />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Form.MaxParticipants" class="form-label"></label>
+                            <input asp-for="Form.MaxParticipants" type="number" step="1" min="1" class="form-control" required />
+                            <div class="form-text">Can't be lower than the number of people already enrolled.</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <a asp-action="Categories" asp-route-id="@Model.EventId" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

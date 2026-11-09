@@ -1,0 +1,70 @@
+@model List<MyEnrolment>
+@{
+    ViewData["Title"] = "My enrolments";
+    var today = DateTime.UtcNow.Date;
+}
+
+<h1 class="rd-title">My enrolments</h1>
+<p class="text-muted">Every event you've entered, and where each enrolment stands.</p>
+
+@if (Model.Count == 0)
+{
+    <div class="rd-empty">
+        <div class="rd-empty-icon">👟</div>
+        <h2>You haven't entered any events yet</h2>
+        <p class="text-muted">Pick an event, choose your distance and you'll see it here straight away.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Browse events</a>
+    </div>
+}
+else
+{
+    <div class="card rd-panel">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Bib</th>
+                        <th>Status</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.OrderBy(m => m.EventDate))
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="fw-semibold">@e.EventName</a><br />
+                                <small class="text-muted">📍 @e.Location</small>
+                            </td>
+                            <td>@Format.Date(e.EventDate)</td>
+                            <td>@e.CategoryName</td>
+                            <td><span class="rd-bib">@e.BibNumber</span></td>
+                            <td><partial name="_StatusBadge" model="e.Status" /></td>
+                            <td class="text-end">
+                                @if (e.EventDate.Date >= today)
+                                {
+                                    <form asp-action="CancelEnrolment" asp-route-id="@e.EnrolmentId" method="post"
+                                          data-confirm="Cancel your enrolment in this event?">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Completed</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-3">
+        <span class="status-badge status-pending">Pending</span> means the organiser hasn't confirmed your entry yet.
+        <span class="status-badge status-confirmed">Confirmed</span> means you're in.
+    </p>
+}

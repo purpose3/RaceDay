@@ -1,0 +1,101 @@
+@model CategoriesViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = "Categories · " + ev.EventName;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ev.EventName</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h1 class="rd-title mb-0">Categories</h1>
+        <p class="text-muted mb-0">@ev.EventName · @Format.Date(ev.EventDate) · @ev.Location</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Enrolments" asp-route-id="@ev.EventId" class="btn btn-outline-primary">Enrolments</a>
+        <a asp-action="Results" asp-route-id="@ev.EventId" class="btn btn-outline-primary">Results</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        @if (ev.Categories.Count == 0)
+        {
+            <div class="rd-empty">
+                <div class="rd-empty-icon">🏷️</div>
+                <h2>No categories yet</h2>
+                <p class="text-muted mb-0">Add an age or distance category, such as "5km Fun Run", "10km Road Race" or "Under 20", so participants can enrol.</p>
+            </div>
+        }
+        else
+        {
+            <div class="card rd-panel">
+                <div class="table-responsive">
+                    <table class="table rd-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Distance</th>
+                                <th>Entry fee</th>
+                                <th>Max</th>
+                                <th class="text-end"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in ev.Categories.OrderBy(c => c.DistanceKm))
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@c.CategoryName</td>
+                                    <td>@Format.Km(c.DistanceKm)</td>
+                                    <td>@Format.Money(c.EntryFee)</td>
+                                    <td>@c.MaxParticipants</td>
+                                    <td class="text-end text-nowrap">
+                                        <a asp-action="EditCategory" asp-route-id="@c.CategoryId" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <form asp-action="DeleteCategory" asp-route-id="@c.CategoryId" asp-route-eventId="@ev.EventId" method="post" class="d-inline"
+                                              data-confirm="Remove this category? Categories with enrolments can't be removed.">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card rd-panel rd-enrol">
+            <div class="card-body p-4">
+                <h2 class="rd-section">Add a category</h2>
+                <form asp-action="AddCategory" asp-route-id="@ev.EventId" method="post">
+                    <div class="mb-3">
+                        <label asp-for="NewCategory.CategoryName" class="form-label"></label>
+                        <input asp-for="NewCategory.CategoryName" class="form-control" maxlength="100" placeholder="e.g. 10km Road Race" required />
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label asp-for="NewCategory.DistanceKm" class="form-label"></label>
+                            <input asp-for="NewCategory.DistanceKm" type="number" step="0.1" min="0.1" class="form-control" required />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="NewCategory.EntryFee" class="form-label"></label>
+                            <input asp-for="NewCategory.EntryFee" type="number" step="0.01" min="0" class="form-control" required />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="NewCategory.MaxParticipants" class="form-label"></label>
+                            <input asp-for="NewCategory.MaxParticipants" type="number" step="1" min="1" class="form-control" required />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-4">Add category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

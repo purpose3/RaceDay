@@ -1,0 +1,104 @@
+@model ResultsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = "Results · " + ev.EventName;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ev.EventName</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h1 class="rd-title mb-0">Results entry</h1>
+        <p class="text-muted mb-0">@ev.EventName · @Format.Date(ev.EventDate) · @ev.Location</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Categories" asp-route-id="@ev.EventId" class="btn btn-outline-primary">Categories</a>
+        <a asp-action="Enrolments" asp-route-id="@ev.EventId" class="btn btn-outline-primary">Enrolments</a>
+    </div>
+</div>
+
+@if (!Model.CanCapture)
+{
+    <div class="alert alert-info">
+        Results can be captured on or after the event date (<strong>@Format.Date(ev.EventDate)</strong>). Come back once the event has concluded.
+    </div>
+}
+else
+{
+    <p class="text-muted">Enter each participant's finish time as <strong>hh:mm:ss</strong> (for example <code>00:48:32</code>) and their finishing positions. Saved results are published to the public leaderboard straight away.</p>
+}
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="rd-empty">
+        <div class="rd-empty-icon">⏱️</div>
+        <h2>No participants to record</h2>
+        <p class="text-muted mb-0">Results are captured for enrolled participants. Nobody has enrolled in this event.</p>
+    </div>
+}
+else
+{
+    <div class="card rd-panel">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Category</th>
+                        <th>Bib</th>
+                        <th>Finish time</th>
+                        <th>Overall pos.</th>
+                        <th>Category pos.</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Rows)
+                    {
+                        var e = r.Enrolment;
+                        var res = r.Result;
+                        <tr>
+                            <td>
+                                <span class="fw-semibold">@e.Participant.FirstName @e.Participant.LastName</span><br />
+                                <partial name="_StatusBadge" model="e.Status" />
+                            </td>
+                            <td>@e.CategoryName</td>
+                            <td><span class="rd-bib">@e.BibNumber</span></td>
+                            <td style="min-width:130px">
+                                <input form="result-@(e.EnrolmentId)" name="FinishTime" class="form-control form-control-sm"
+                                       placeholder="00:48:32" pattern="\d{1,2}:[0-5]\d:[0-5]\d" title="hh:mm:ss, for example 00:48:32"
+                                       value="@(res is null ? "" : Format.Time(res.FinishTime))" required disabled="@(!Model.CanCapture)" />
+                            </td>
+                            <td style="min-width:90px">
+                                <input form="result-@(e.EnrolmentId)" name="OverallPosition" type="number" min="1" class="form-control form-control-sm"
+                                       value="@res?.OverallPosition" disabled="@(!Model.CanCapture)" />
+                            </td>
+                            <td style="min-width:90px">
+                                <input form="result-@(e.EnrolmentId)" name="CategoryPosition" type="number" min="1" class="form-control form-control-sm"
+                                       value="@res?.CategoryPosition" disabled="@(!Model.CanCapture)" />
+                            </td>
+                            <td class="text-end">
+                                <form id="result-@(e.EnrolmentId)" asp-action="SaveResult" method="post">
+                                    <input type="hidden" name="EventId" value="@ev.EventId" />
+                                    <input type="hidden" name="EnrolmentId" value="@e.EnrolmentId" />
+                                    @if (res is not null)
+                                    {
+                                        <input type="hidden" name="ResultId" value="@res.ResultId" />
+                                    }
+                                    <button type="submit" class="btn btn-sm @(res is null ? "btn-primary" : "btn-outline-primary")" disabled="@(!Model.CanCapture)">
+                                        @(res is null ? "Save result" : "Update")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

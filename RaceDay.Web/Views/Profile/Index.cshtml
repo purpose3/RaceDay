@@ -1,0 +1,89 @@
+@model UserProfile
+@inject UserSession Me
+@{
+    ViewData["Title"] = "My profile";
+    var initial = Model.FirstName.Length > 0 ? Model.FirstName.Substring(0, 1).ToUpperInvariant() : "?";
+}
+
+<h1 class="rd-title">My profile</h1>
+<p class="text-muted">Keep your details up to date so organisers can reach you.</p>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card rd-panel text-center">
+            <div class="card-body p-4">
+                @if (Model.ProfilePictureUrl is not null)
+                {
+                    <img class="rd-profile-pic" src="~/media/profile?v=@Me.PictureVersion" alt="Your profile picture" />
+                }
+                else
+                {
+                    <div class="rd-profile-pic rd-avatar-initial">@initial</div>
+                }
+                <h2 class="rd-card-title mt-3 mb-0">@Model.FirstName @Model.LastName</h2>
+                <p class="text-muted mb-1">@Model.Role</p>
+                <p class="small text-muted">Member since @Model.CreatedAt.ToString("MMMM yyyy")</p>
+
+                <form asp-action="UploadPicture" method="post" enctype="multipart/form-data" class="text-start mt-3">
+                    <label for="picture" class="form-label">Profile picture</label>
+                    <input type="file" id="picture" name="picture" class="form-control" accept="image/png,image/jpeg,image/webp" required />
+                    <div class="form-text">JPEG, PNG or WebP, up to 5 MB.</div>
+                    <button type="submit" class="btn btn-outline-primary w-100 mt-3">Upload picture</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card rd-panel mb-4">
+            <div class="card-body p-4">
+                <h2 class="rd-section">Personal information</h2>
+                <form asp-action="Update" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="FirstName" class="form-label">First name</label>
+                            <input id="FirstName" name="FirstName" value="@Model.FirstName" class="form-control" maxlength="30" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="LastName" class="form-label">Last name</label>
+                            <input id="LastName" name="LastName" value="@Model.LastName" class="form-control" maxlength="30" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Email" class="form-label">Email address</label>
+                            <input id="Email" value="@Model.Email" class="form-control" disabled />
+                            <div class="form-text">Your email is your login and can't be changed here.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="PhoneNumber" class="form-label">Phone number</label>
+                            <input id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" class="form-control" maxlength="30" required />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Save changes</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card rd-panel">
+            <div class="card-body p-4">
+                <h2 class="rd-section">Change password</h2>
+                <form asp-action="ChangePassword" method="post">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="CurrentPassword" class="form-label">Current password</label>
+                            <input type="password" id="CurrentPassword" name="CurrentPassword" class="form-control" autocomplete="current-password" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="NewPassword" class="form-label">New password</label>
+                            <input type="password" id="NewPassword" name="NewPassword" class="form-control" autocomplete="new-password" minlength="8" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ConfirmNewPassword" class="form-label">Confirm new password</label>
+                            <input type="password" id="ConfirmNewPassword" name="ConfirmNewPassword" class="form-control" autocomplete="new-password" minlength="8" required />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary mt-4">Change password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

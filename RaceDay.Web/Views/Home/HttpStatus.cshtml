@@ -1,0 +1,12 @@
+@{
+    var code = (int)(ViewBag.Code ?? 404);
+    ViewData["Title"] = code == 404 ? "Page not found" : "Something went wrong";
+}
+<div class="rd-empty">
+    <div class="rd-empty-icon">@(code == 404 ? "🧭" : "🛠️")</div>
+    <h1 class="rd-title">@(code == 404 ? "We can't find that page" : "Something went wrong")</h1>
+    <p class="text-muted">
+        @(code == 404 ? "The page may have moved, or the event may no longer exist." : "Please try again in a moment.")
+    </p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to events</a>
+</div>

@@ -1,0 +1,89 @@
+@model EventFormModel
+@{
+    var isEdit = Model.EventId.HasValue;
+    ViewData["Title"] = isEdit ? "Edit event" : "Create event";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Events">My events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+    </ol>
+</nav>
+
+<h1 class="rd-title">@(isEdit ? "Edit event" : "Create event")</h1>
+<p class="text-muted">All fields marked * are required. The banner appears at the top of the event page.</p>
+
+<div class="card rd-panel">
+    <div class="card-body p-4">
+        <form asp-action="@(isEdit ? "EditEvent" : "CreateEvent")" asp-route-id="@Model.EventId"
+              method="post" enctype="multipart/form-data" novalidate>
+            <input type="hidden" asp-for="EventId" />
+            <input type="hidden" asp-for="HasBanner" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="EventName" class="form-label"></label>
+                    <input asp-for="EventName" class="form-control" maxlength="100" required />
+                    <span asp-validation-for="EventName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="EventType" class="form-label"></label>
+                    <select asp-for="EventType" class="form-select">
+                        <option value="Run">Run</option>
+                        <option value="Walk">Walk</option>
+                        <option value="Cycle">Cycle</option>
+                    </select>
+                    <span asp-validation-for="EventType" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="EventDate" class="form-label"></label>
+                    <input asp-for="EventDate" type="date" asp-format="{0:yyyy-MM-dd}" class="form-control" required />
+                    <span asp-validation-for="EventDate" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DistanceKm" class="form-label"></label>
+                    <input asp-for="DistanceKm" type="number" step="0.1" min="0.1" class="form-control" required />
+                    <span asp-validation-for="DistanceKm" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Location" class="form-label"></label>
+                    <input asp-for="Location" class="form-control" maxlength="100" placeholder="e.g. Pretoria, Gauteng" required />
+                    <span asp-validation-for="Location" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3" maxlength="300" required></textarea>
+                    <div class="form-text">Up to 300 characters.</div>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="RouteInfo" class="form-label"></label>
+                    <input asp-for="RouteInfo" class="form-control" maxlength="100" placeholder="e.g. Starts at Union Buildings, loops through Arcadia Park" />
+                    <span asp-validation-for="RouteInfo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label for="banner" class="form-label">Event banner image</label>
+                    @if (isEdit && Model.HasBanner)
+                    {
+                        <div class="mb-2">
+                            <img src="~/media/event/@Model.EventId" alt="Current banner" class="rd-banner-preview" />
+                            <div class="form-text">Current banner. Choose a new file below to replace it.</div>
+                        </div>
+                    }
+                    <input type="file" id="banner" name="banner" class="form-control" accept="image/png,image/jpeg,image/webp" />
+                    <div class="form-text">JPEG, PNG or WebP, up to 5 MB. Optional.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">@(isEdit ? "Save changes" : "Create event")</button>
+                <a asp-action="Events" class="btn btn-outline-secondary btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

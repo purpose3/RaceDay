@@ -1,0 +1,71 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Join RaceDay"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7">
+        <div class="card rd-panel">
+            <div class="card-body p-4">
+                <h1 class="rd-title mb-1">Join RaceDay</h1>
+                <p class="text-muted">Create your free account in under a minute.</p>
+
+                <form asp-action="Register" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" autocomplete="given-name" maxlength="30" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" autocomplete="family-name" maxlength="30" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-7">
+                            <label asp-for="Email" class="form-label">Email address</label>
+                            <input asp-for="Email" class="form-control" autocomplete="email" maxlength="100" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" autocomplete="tel" maxlength="30" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                            <div class="form-text">At least 8 characters.</div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Role" class="form-label">I want to join as</label>
+                            <select asp-for="Role" class="form-select" id="Role">
+                                <option value="Participant">Participant: I want to enter events</option>
+                                <option value="Organiser">Organiser: I run events</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12" id="inviteGroup" style="display:none">
+                            <label asp-for="InviteCode" class="form-label"></label>
+                            <input asp-for="InviteCode" class="form-control" autocomplete="off" />
+                            <div class="form-text">Organiser accounts need the invite code provided by RaceDay.</div>
+                            <span asp-validation-for="InviteCode" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Create my account</button>
+                </form>
+
+                <p class="text-center text-muted mt-4 mb-0">
+                    Already have an account? <a asp-action="Login">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

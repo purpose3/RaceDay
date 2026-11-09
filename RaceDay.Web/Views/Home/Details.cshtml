@@ -1,0 +1,126 @@
+@model EventDetailViewModel
+@inject UserSession Me
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.EventName;
+    var isPast = ev.EventDate.Date < DateTime.UtcNow.Date;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Events</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@ev.EventName</li>
+    </ol>
+</nav>
+
+<div class="rd-banner mb-4">
+    @if (ev.BannerUrl is not null)
+    {
+        <img src="~/media/event/@ev.EventId" alt="Banner for @ev.EventName" />
+    }
+    else
+    {
+        <div class="rd-banner-placeholder"><span>@Format.EventIcon(ev.EventType)</span></div>
+    }
+    <div class="rd-banner-caption">
+        <span class="rd-type-chip">@ev.EventType</span>
+        <h1>@ev.EventName</h1>
+        <p class="mb-0">📍 @ev.Location · 📅 @Format.Date(ev.EventDate) · 🏁 @Format.Km(ev.DistanceKm)</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card rd-panel mb-4">
+            <div class="card-body">
+                <h2 class="rd-section">About this event</h2>
+                <p>@ev.Description</p>
+                @if (!string.IsNullOrWhiteSpace(ev.RouteInfo))
+                {
+                    <h3 class="h6 text-uppercase text-muted mt-4">Route</h3>
+                    <p class="mb-0">@ev.RouteInfo</p>
+                }
+            </div>
+        </div>
+
+        @if (Model.Weather is not null)
+        {
+            <div class="card rd-panel rd-weather">
+                <div class="card-body">
+                    <h2 class="rd-section">Race-day forecast</h2>
+                    <div class="d-flex flex-wrap gap-4">
+                        <div><span class="rd-stat">@Model.Weather.TempC.ToString("0")°C</span><br /><small class="text-muted">High</small></div>
+                        <div><span class="rd-stat">@Model.Weather.Conditions</span><br /><small class="text-muted">Conditions</small></div>
+                        <div><span class="rd-stat">@Model.Weather.WindSpeed.ToString("0") km/h</span><br /><small class="text-muted">Wind</small></div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card rd-panel rd-enrol">
+            <div class="card-body">
+                <h2 class="rd-section">Choose your category</h2>
+
+                @if (ev.Categories.Count == 0)
+                {
+                    <p class="text-muted mb-0">The organiser hasn't added categories yet. Check back soon.</p>
+                }
+                else if (Me.IsParticipant && !isPast)
+                {
+                    <form asp-controller="Participant" asp-action="Enrol" method="post">
+                        <input type="hidden" name="eventId" value="@ev.EventId" />
+                        <div class="vstack gap-2">
+                            @foreach (var c in ev.Categories.OrderBy(c => c.DistanceKm))
+                            {
+                                <label class="rd-category">
+                                    <input type="radio" name="categoryId" value="@c.CategoryId" required />
+                                    <span class="rd-category-body">
+                                        <span>
+                                            <strong>@c.CategoryName</strong><br />
+                                            <small class="text-muted">@Format.Km(c.DistanceKm) · up to @c.MaxParticipants entries</small>
+                                        </span>
+                                        <span class="rd-price">@Format.Money(c.EntryFee)</span>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Enrol now</button>
+                    </form>
+                }
+                else
+                {
+                    <ul class="list-unstyled vstack gap-2 mb-3">
+                        @foreach (var c in ev.Categories.OrderBy(c => c.DistanceKm))
+                        {
+                            <li class="rd-category rd-category-static">
+                                <span class="rd-category-body">
+                                    <span>
+                                        <strong>@c.CategoryName</strong><br />
+                                        <small class="text-muted">@Format.Km(c.DistanceKm)</small>
+                                    </span>
+                                    <span class="rd-price">@Format.Money(c.EntryFee)</span>
+                                </span>
+                            </li>
+                        }
+                    </ul>
+
+                    @if (isPast)
+                    {
+                        <div class="alert alert-secondary mb-0">This event has already taken place.</div>
+                    }
+                    else if (!Me.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary btn-lg w-100">Log in to enrol</a>
+                        <p class="text-center text-muted small mt-2 mb-0">No account? <a asp-controller="Account" asp-action="Register">Join RaceDay</a></p>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">You're logged in as an Organiser. Only Participants can enrol in events.</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

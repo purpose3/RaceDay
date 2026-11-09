@@ -1,0 +1,101 @@
+@model OrganiserDashboard
+@inject UserSession Me
+@{ ViewData["Title"] = "Organiser dashboard"; }
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h1 class="rd-title mb-0">Dashboard</h1>
+        <p class="text-muted mb-0">Welcome back@(string.IsNullOrWhiteSpace(Me.FirstName) ? "" : ", " + Me.FirstName). Here's how your events are doing.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Events" class="btn btn-outline-primary">Manage events</a>
+        <a asp-action="CreateEvent" class="btn btn-primary">+ Create event</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="rd-tile"><span class="rd-tile-value">@Model.TotalEvents</span><span class="rd-tile-label">Events created</span></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-tile"><span class="rd-tile-value">@Model.UpcomingEvents</span><span class="rd-tile-label">Upcoming events</span></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-tile"><span class="rd-tile-value">@Model.TotalEnrolments</span><span class="rd-tile-label">Total enrolments</span></div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="rd-tile rd-tile-accent">
+            @if (Model.NextEventDate is { } next)
+            {
+                <span class="rd-tile-value">@next.ToString("d MMM")</span>
+                <span class="rd-tile-label">Next: @Model.NextEventName</span>
+            }
+            else
+            {
+                <span class="rd-tile-value">-</span>
+                <span class="rd-tile-label">No upcoming event</span>
+            }
+        </div>
+    </div>
+</div>
+
+<h2 class="rd-section">Your events</h2>
+
+@if (Model.Events.Count == 0)
+{
+    <div class="rd-empty">
+        <div class="rd-empty-icon">📣</div>
+        <h2>You haven't created any events yet</h2>
+        <p class="text-muted">Create your first event and it will show up here with enrolment totals.</p>
+        <a asp-action="CreateEvent" class="btn btn-primary">Create your first event</a>
+    </div>
+}
+else
+{
+    <div class="card rd-panel">
+        <div class="table-responsive">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th class="text-center">Categories</th>
+                        <th class="text-center">Enrolments</th>
+                        <th class="text-center">Results</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.Events)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@e.EventId" class="fw-semibold">@e.EventName</a><br />
+                                <small class="text-muted">@Format.EventIcon(e.EventType) @e.EventType · @Format.Km(e.DistanceKm) · 📍 @e.Location</small>
+                            </td>
+                            <td>@Format.Date(e.EventDate)</td>
+                            <td class="text-center">@e.CategoryCount</td>
+                            <td class="text-center"><strong>@e.TotalEnrolments</strong></td>
+                            <td class="text-center">@e.ResultsCaptured</td>
+                            <td>
+                                @if (e.IsUpcoming)
+                                {
+                                    <span class="status-badge status-confirmed">Upcoming</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-completed">Completed</span>
+                                }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Enrolments" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">Enrolments</a>
+                                <a asp-action="Results" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">Results</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

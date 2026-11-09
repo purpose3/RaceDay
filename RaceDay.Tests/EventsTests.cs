@@ -5,6 +5,7 @@ using RaceDay.Tests.Infrastructure;
 
 namespace RaceDay.Tests;
 
+
 public class EventsTests : IClassFixture<RaceDayFactory>
 {
     private readonly RaceDayFactory _factory;
